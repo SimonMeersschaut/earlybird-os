@@ -7,9 +7,23 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <a class="app-clock" href="/" aria-label="Return to the main clock">
+    <time id="app-current-time" datetime="00:00">00:00</time>
+  </a>
   <main class="app-page briefing-page">
     <span class="app-page-icon" aria-hidden="true">☀</span>
     <h1>Morning briefing</h1>
   </main>
+  <script>
+    const clock = document.querySelector("#app-current-time");
+    const updateClock = () => {
+      const now = new Date();
+      const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      clock.textContent = time;
+      clock.dateTime = time;
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
 </body>
 </html>
