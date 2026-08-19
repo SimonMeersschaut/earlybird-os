@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run alarm clock webserver",
+      "type": "shell",
+      "command": "python",
+      "args": ["run.py"],
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
