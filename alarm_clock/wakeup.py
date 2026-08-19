@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
+import random
 from threading import Condition, Event, Lock
 from typing import Callable, Protocol
 
@@ -42,6 +44,54 @@ class PhilipsHueSunrise:
         }
         for light_id in group["lights"]:
             bridge.set_light(int(light_id), command)
+
+
+class PygameAudioAlarm:
+    """Play the alarm track from a random position and loop it."""
+
+    def __init__(self, audio_file: Path, random_position: Callable[[float, float], float] | None = None) -> None:
+        self.audio_file = audio_file
+        self.random_position = random_position or random.uniform
+
+    def wake(self) -> None:
+        import pygame
+        from mutagen.mp3 import MP3
+
+        pygame.mixer.init()
+        total_length = MP3(self.audio_file).info.length
+        start_time = self.random_position(0, max(0, total_length - 60))
+        pygame.mixer.music.load(str(self.audio_file))
+        pygame.mixer.music.play(loops=1, start=start_time, fade_ms=2000)
+
+    def stop_alarm(self) -> None:
+        import pygame
+
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+            pygame.mixer.quit()
+
+
+class CombinedWakeupAction:
+    """Run all wakeup actions, allowing one hardware failure to be isolated."""
+
+    def __init__(self, actions: list[WakeupAction]) -> None:
+        self.actions = actions
+
+    def wake(self) -> None:
+        failures: list[Exception] = []
+        for action in self.actions:
+            try:
+                action.wake()
+            except Exception as error:
+                failures.append(error)
+        if failures and len(failures) == len(self.actions):
+            raise failures[0]
+
+    def stop_alarm(self) -> None:
+        for action in self.actions:
+            stop = getattr(action, "stop_alarm", None)
+            if stop:
+                stop()
 
 
 class WakeupService:
@@ -114,6 +164,14 @@ class WakeupService:
         with self._lock:
             return {"awake": self._awake}
 
+    def stop_alarm(self) -> None:
+        stop = getattr(self.action, "stop_alarm", None)
+        if stop:
+            stop()
+        with self._lock:
+            self._awake = False
+        self._notify_listeners()
+
     def run(self) -> None:
         while not self._stop.is_set():
             status = self.alarm_controller.get_status()
@@ -133,6 +191,9 @@ class WakeupService:
                     pass
 
     def stop(self) -> None:
+        stop_alarm = getattr(self.action, "stop_alarm", None)
+        if stop_alarm:
+            stop_alarm()
         self._stop.set()
         with self._wake_condition:
             self._wake_condition.notify_all()

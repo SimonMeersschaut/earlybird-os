@@ -38,6 +38,14 @@ def test_server_serves_the_clock_ui(tmp_path: Path) -> None:
         connection.request("GET", "/api/message")
         message_response = connection.getresponse()
         message_body = json.loads(message_response.read().decode("utf-8"))
+        connection.request(
+            "POST",
+            "/api/wakeup",
+            body=json.dumps({"action": "stop"}),
+            headers={"Content-Type": "application/json"},
+        )
+        wakeup_response = connection.getresponse()
+        wakeup_body = json.loads(wakeup_response.read().decode("utf-8"))
     finally:
         server.shutdown()
         server.server_close()
@@ -55,6 +63,8 @@ def test_server_serves_the_clock_ui(tmp_path: Path) -> None:
     ]
     assert message_response.status == 200
     assert message_body == {"icon": "/icons/test.svg", "text": "Time to go to sleep"}
+    assert wakeup_response.status == 200
+    assert wakeup_body == {"awake": False}
 
 
 def test_alarm_api_accepts_a_manual_override(tmp_path: Path) -> None:

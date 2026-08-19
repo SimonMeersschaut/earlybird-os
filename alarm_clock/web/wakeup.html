@@ -4,8 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wakeup | Earlybird</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/base.css">
+  <link rel="stylesheet" href="/wakeup.css">
 </head>
 <body>
+  <a class="app-clock" href="/" aria-label="Return to the main clock">
+    <time id="app-current-time" datetime="00:00">00:00</time>
+  </a>
+  <main class="wakeup-page">
+    <button id="stop-alarm" class="stop-alarm" type="button">Stop alarm</button>
+  </main>
+
+  <script>
+    const clock = document.querySelector("#app-current-time");
+    const updateClock = () => {
+      const now = new Date();
+      const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      clock.textContent = time;
+      clock.dateTime = time;
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    document.querySelector("#stop-alarm").addEventListener("click", () => {
+      fetch("/api/wakeup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "stop" })
+      }).then(resp => {
+        window.location = "/";
+      })
+    });
+  </script>
 </body>
 </html>

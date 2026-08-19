@@ -6,7 +6,7 @@ from threading import Thread
 from .alarm import AlarmController, FixedAlarmController
 from .calendar import CalendarMessageProvider, GoogleCalendar, RefreshingMessageProvider
 from .message import Message
-from .wakeup import PhilipsHueSunrise, WakeupService
+from .wakeup import CombinedWakeupAction, PhilipsHueSunrise, PygameAudioAlarm, WakeupService
 
 
 class ClockApplication:
@@ -24,9 +24,13 @@ class ClockApplication:
             calendar_provider = CalendarMessageProvider(GoogleCalendar())
             self.alarm_controller = AlarmController(calendar_provider)
             self.message_provider = self.alarm_controller
+        wakeup_actions = CombinedWakeupAction([
+            PhilipsHueSunrise("Kamer Simon"),
+            PygameAudioAlarm(Path(__file__).parent.parent / "alarm.mp3"),
+        ])
         self.wakeup_service = WakeupService(
             self.alarm_controller,
-            PhilipsHueSunrise("Kamer Simon"),
+            wakeup_actions,
         )
         self._refresh_thread = None
         self._wakeup_thread = None

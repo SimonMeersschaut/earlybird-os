@@ -72,6 +72,17 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self) -> None:
+        if self.path == "/api/wakeup":
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length))
+                if payload.get("action") != "stop":
+                    raise ValueError
+                self.wakeup_service.stop_alarm()
+                self._serve_json(self.wakeup_service.get_status())
+            except (AttributeError, TypeError, ValueError, json.JSONDecodeError):
+                self.send_error(400, "Expected JSON with action stop")
+            return
         if self.path != "/api/alarm":
             self.send_error(404)
             return

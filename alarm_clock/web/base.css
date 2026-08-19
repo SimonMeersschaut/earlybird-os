@@ -1,0 +1,59 @@
+:root {
+  color-scheme: dark;
+  font-family: "Arial Black", Impact, sans-serif;
+  background: #050505;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+.app-icon,
+.app-page-icon {
+  font-family: Arial, sans-serif;
+  font-size: clamp(3rem, 9vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.app-name {
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.app-clock {
+  color: #474747;
+  font-size: clamp(2rem, 7vw, 5rem);
+  font-weight: 900;
+  left: 50%;
+  line-height: 1;
+  position: fixed;
+  text-decoration: none;
+  top: 1.25rem;
+  transform: translateX(-50%);
+  transition: color 180ms ease, transform 180ms ease;
+  z-index: 1;
+}
+
+.app-clock:hover,
+.app-clock:focus-visible {
+  color: #707070;
+  transform: translateX(-50%) scale(1.04);
+}
+
+.app-page {
+  color: #474747;
+  text-align: center;
+}
+
+.app-page h1 {
+  font-family: Arial, sans-serif;
+  font-size: 2rem;
+  margin: 1rem 0 0;
+}

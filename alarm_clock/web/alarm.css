@@ -1,0 +1,116 @@
+.alarm-option,
+.alarm-form {
+  font-family: Arial, sans-serif;
+}
+
+.alarm-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 34rem;
+  width: min(90vw, 34rem);
+}
+
+.alarm-option {
+  background: #151515;
+  border: 2px solid #262626;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  color: #777;
+  cursor: pointer;
+  min-width: 0;
+  padding: 1rem;
+  text-align: left;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.alarm-option.is-active {
+  background: #1d1d1d;
+  border-color: #777;
+  color: #c0c0c0;
+}
+
+.alarm-option-heading {
+  align-items: center;
+  display: flex;
+  font-size: 1rem;
+  font-weight: 700;
+  gap: 0.6rem;
+}
+
+.alarm-option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alarm-option-icon {
+  color: #a0a0a0;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.alarm-time {
+  display: block;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  letter-spacing: 0.03em;
+  margin: 1rem 0 0.5rem;
+}
+
+.alarm-calculation {
+  color: #777;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.manual-dialog {
+  background: #151515;
+  border: 1px solid #454545;
+  border-radius: 0.75rem;
+  color: #c0c0c0;
+  padding: 1.25rem;
+}
+
+.manual-dialog-title {
+  color: #777;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.alarm-times {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(3, minmax(4.5rem, 1fr));
+}
+
+.alarm-time-choice {
+  background: #242424;
+  border: 1px solid #454545;
+  border-radius: 0.5rem;
+  color: #c0c0c0;
+  cursor: pointer;
+  font: 700 0.95rem Arial, sans-serif;
+  padding: 0.65rem 0.8rem;
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.alarm-time-choice:hover,
+.alarm-time-choice:focus-visible {
+  background: #353535;
+  border-color: #777;
+}
+
+.manual-dialog::backdrop {
+  background: rgb(0 0 0 / 65%);
+}
+
+@media (max-width: 30rem) {
+  .alarm-options {
+    gap: 0.6rem;
+  }
+
+  .alarm-option {
+    padding: 0.75rem;
+  }
+}

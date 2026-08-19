@@ -18,8 +18,11 @@ Run the focused test suite with:
 python -m pytest
 ```
 
-
 ```bash
 pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 pip install phue
+```
+
+```bash
+chromium-browser --autoplay-policy=no-user-gesture-required --kiosk http://localhost:5000
 ```
