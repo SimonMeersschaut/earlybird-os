@@ -7,10 +7,29 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <main class="shell">
-    <p class="eyebrow">Earlybird</p>
-    <h1>Alarm clock</h1>
-    <p class="status">The UI foundation is ready.</p>
+  <main class="clock" aria-label="Current time">
+    <time id="current-time" class="time" datetime="00:00:00">00:00:00</time>
+    <p class="message">
+      <img src="{{MESSAGE_ICON}}" alt="">
+      <span>{{MESSAGE_TEXT}}</span>
+    </p>
   </main>
+  <script>
+    const clock = document.querySelector("#current-time");
+
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+    //   const seconds = String(now.getSeconds()).padStart(2, "0");
+      const time = `${hours}:${minutes}`;
+
+      clock.textContent = time;
+      clock.dateTime = time;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
 </body>
 </html>

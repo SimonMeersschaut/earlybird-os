@@ -3,14 +3,20 @@ from threading import Thread
 from pathlib import Path
 
 from alarm_clock.application import ClockApplication
+from alarm_clock.message import Message
 
 
-def test_server_serves_the_placeholder_ui(tmp_path: Path) -> None:
+def test_server_serves_the_clock_ui(tmp_path: Path) -> None:
     web_root = tmp_path / "web"
     web_root.mkdir()
-    (web_root / "index.html").write_text("<h1>Alarm clock</h1>", encoding="utf-8")
+    (web_root / "index.html").write_text(
+        '<time id="current-time">00:00:00</time>'
+        '<img src="{{MESSAGE_ICON}}"><span>{{MESSAGE_TEXT}}</span>',
+        encoding="utf-8",
+    )
 
-    server = ClockApplication(web_root).create_server(port=0)
+    message = Message("/icons/test.svg", "Time to go to sleep")
+    server = ClockApplication(web_root, message).create_server(port=0)
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
 
@@ -25,4 +31,6 @@ def test_server_serves_the_placeholder_ui(tmp_path: Path) -> None:
         thread.join()
 
     assert response.status == 200
-    assert "Alarm clock" in body
+    assert 'id="current-time"' in body
+    assert 'src="/icons/test.svg"' in body
+    assert "Time to go to sleep" in body

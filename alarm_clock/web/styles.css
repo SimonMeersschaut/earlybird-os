@@ -1,8 +1,7 @@
 :root {
-  color-scheme: light;
-  font-family: Georgia, "Times New Roman", serif;
-  background: #f4efe6;
-  color: #1d2b25;
+  color-scheme: dark;
+  font-family: "Arial Black", Impact, sans-serif;
+  background: #050505;
 }
 
 body {
@@ -10,31 +9,43 @@ body {
   margin: 0;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle at 20% 10%, #fffaf0, transparent 42%), #f4efe6;
 }
 
-.shell {
-  width: min(88vw, 42rem);
-  padding: 4rem 0;
+.clock {
+  width: 100%;
+  text-align: center;
 }
 
-.eyebrow {
-  margin: 0 0 1rem;
-  color: #b34c2e;
-  font: 700 0.78rem/1.2 sans-serif;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.time {
+  display: block;
+  color: #474747;
+  font-size: clamp(4rem, 18vw, 18rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.9;
+  white-space: nowrap;
 }
 
-h1 {
-  margin: 0;
-  font-size: clamp(3rem, 9vw, 6.5rem);
-  font-weight: 400;
-  line-height: 0.95;
+.message {
+  align-items: center;
+  color: #303030;
+  display: flex;
+  font-family: Arial, sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  gap: 0.6rem;
+  justify-content: center;
+  margin: 1.5rem 0 0;
 }
 
-.status {
-  margin: 2rem 0 0;
-  color: #59675f;
-  font: 1rem/1.5 sans-serif;
+.message img {
+  height: 1.4em;
+  width: 1.4em;
+  filter: brightness(0) invert(0.25);
+}
+
+@media (max-width: 30rem) {
+  .time {
+    font-size: 19vw;
+  }
 }
