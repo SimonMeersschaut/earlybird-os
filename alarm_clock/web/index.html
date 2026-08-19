@@ -10,12 +10,49 @@
   <main class="clock" aria-label="Current time">
     <time id="current-time" class="time" datetime="00:00:00">00:00:00</time>
     <p class="message">
-      <img src="{{MESSAGE_ICON}}" alt="">
-      <span>{{MESSAGE_TEXT}}</span>
+      <img id="message-icon" src="{{MESSAGE_ICON}}" alt="">
+      <span id="message-text">{{MESSAGE_TEXT}}</span>
     </p>
+  </main>
+  <main class="apps" aria-labelledby="apps-title" hidden>
+    <h1 id="apps-title">Apps</h1>
+    <div class="app-grid">
+      <a class="app-card weather-app" href="/weather.html">
+        <span class="app-icon" aria-hidden="true">☁</span>
+        <span class="app-name">Weather</span>
+      </a>
+      <a class="app-card alarm-app" href="/alarm.html">
+        <span class="app-icon" aria-hidden="true">◷</span>
+        <span class="app-name">Alarm</span>
+      </a>
+      <a class="app-card briefing-app" href="/morning-briefing.html">
+        <span class="app-icon" aria-hidden="true">☀</span>
+        <span class="app-name">Morning briefing</span>
+      </a>
+    </div>
   </main>
   <script>
     const clock = document.querySelector("#current-time");
+    const clockView = document.querySelector(".clock");
+    const appsView = document.querySelector(".apps");
+    const messageIcon = document.querySelector("#message-icon");
+    const messageText = document.querySelector("#message-text");
+    let inactivityTimer;
+    let appsTransitionTimer;
+
+    async function updateMessage() {
+      try {
+        const response = await fetch("/api/message", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+        const message = await response.json();
+        messageIcon.src = message.icon;
+        messageText.textContent = message.text;
+      } catch (error) {
+        // The server may be temporarily unavailable while restarting.
+      }
+    }
 
     function updateClock() {
       const now = new Date();
@@ -30,6 +67,46 @@
 
     updateClock();
     setInterval(updateClock, 1000);
+    setInterval(updateMessage, 10000);
+
+    function showApps() {
+      clearTimeout(appsTransitionTimer);
+      clockView.classList.add("is-minimized");
+      appsView.hidden = false;
+      document.body.classList.add("apps-open");
+      requestAnimationFrame(() => appsView.classList.add("is-visible"));
+
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => showClock(), 60000);
+    }
+
+    function showClock() {
+      clearTimeout(inactivityTimer);
+      clearTimeout(appsTransitionTimer);
+      clockView.classList.remove("is-minimized");
+      appsView.classList.remove("is-visible");
+      document.body.classList.remove("apps-open");
+      appsTransitionTimer = setTimeout(() => {
+        appsView.hidden = true;
+      }, 700);
+    }
+
+    document.addEventListener("click", () => {
+      if (!appsView.hidden) {
+        return;
+      }
+      showApps();
+    });
+
+    clockView.addEventListener("click", (event) => {
+      if (appsView.hidden) {
+        return;
+      }
+      event.stopPropagation();
+      showClock();
+    });
+
+    showClock();
   </script>
 </body>
 </html>
