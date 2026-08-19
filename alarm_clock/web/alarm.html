@@ -11,9 +11,28 @@
     <time id="app-current-time" datetime="00:00">00:00</time>
   </a>
   <main class="app-page alarm-page">
-    <span class="app-page-icon" aria-hidden="true">◷</span>
-    <h1>Alarm</h1>
+    <div class="alarm-options" aria-label="Alarm source">
+      <button id="google-option" class="alarm-option alarm-option-google" type="button">
+        <div class="alarm-option-heading">
+          <span class="alarm-option-icon" aria-hidden="true">↻</span>
+          <span class="alarm-option-name">Google Calendar</span>
+        </div>
+        <strong id="google-alarm-time" class="alarm-time">--:-- - --:--</strong>
+        <p id="google-calculation" class="alarm-calculation">Waiting for the calendar</p>
+      </button>
+      <button id="manual-option" class="alarm-option alarm-option-manual" type="button">
+        <div class="alarm-option-heading">
+          <span class="alarm-option-icon" aria-hidden="true">✎</span>
+          <span class="alarm-option-name">Manual</span>
+        </div>
+        <strong id="manual-alarm-time" class="alarm-time">--:--</strong>
+      </button>
+    </div>
   </main>
+  <dialog id="manual-dialog" class="manual-dialog">
+    <p class="manual-dialog-title">Wake-up time</p>
+    <div id="alarm-times" class="alarm-times" role="group" aria-label="Choose wake-up time"></div>
+  </dialog>
   <script>
     const clock = document.querySelector("#app-current-time");
     const updateClock = () => {
@@ -24,6 +43,77 @@
     };
     updateClock();
     setInterval(updateClock, 1000);
+
+    const googleOption = document.querySelector("#google-option");
+    const manualOption = document.querySelector("#manual-option");
+    const googleAlarmTime = document.querySelector("#google-alarm-time");
+    const googleCalculation = document.querySelector("#google-calculation");
+    const manualAlarmTime = document.querySelector("#manual-alarm-time");
+    const manualDialog = document.querySelector("#manual-dialog");
+    const alarmTimes = document.querySelector("#alarm-times");
+
+    function formatAlarmTime(value) {
+      return value ? new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "--:--";
+    }
+
+    function renderAlarm(status) {
+      googleAlarmTime.textContent = `${formatAlarmTime(status.google_sleep_at)} - ${formatAlarmTime(status.google_wake_at)}`;
+      manualAlarmTime.textContent = formatAlarmTime(status.manual_override ? status.wake_at : null);
+      googleCalculation.textContent = status.first_task_at
+        ? `${status.wake_margin_minutes} minutes before the first task at ${formatAlarmTime(status.first_task_at)}`
+        : "No timed calendar event found";
+      googleOption.classList.toggle("is-active", !status.manual_override);
+      manualOption.classList.toggle("is-active", status.manual_override);
+    }
+
+    async function loadAlarm() {
+      const response = await fetch("/api/alarm", { cache: "no-store" });
+      if (response.ok) {
+        renderAlarm(await response.json());
+      }
+    }
+
+    async function setAutomatic() {
+      const response = await fetch("/api/alarm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "automatic" })
+      });
+      if (response.ok) {
+        renderAlarm(await response.json());
+      }
+    }
+
+    googleOption.addEventListener("click", setAutomatic);
+    manualOption.addEventListener("click", () => {
+      manualDialog.showModal();
+    });
+
+    async function setManualTime(time) {
+      const response = await fetch("/api/alarm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ time })
+      });
+      if (response.ok) {
+        renderAlarm(await response.json());
+        manualDialog.close();
+      }
+    }
+
+    for (let hour = 6; hour <= 11; hour += 1) {
+      for (const minute of [0, 30]) {
+        const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+        const button = document.createElement("button");
+        button.className = "alarm-time-choice";
+        button.type = "button";
+        button.textContent = time.replace(":", ".");
+        button.addEventListener("click", () => setManualTime(time));
+        alarmTimes.append(button);
+      }
+    }
+
+    loadAlarm();
   </script>
 </body>
 </html>

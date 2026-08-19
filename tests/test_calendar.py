@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
 
 from alarm_clock.calendar import AlarmCalculator, CalendarEvent
+from alarm_clock.alarm import AlarmController
+from alarm_clock.message import Message
 
 
 def test_alarm_uses_nine_hours_before_ninety_minutes_before_first_timed_event() -> None:
@@ -21,3 +23,31 @@ def test_alarm_ignores_all_day_events() -> None:
     message = AlarmCalculator().message_for([all_day_event, timed_event], now)
 
     assert message.text == "21.30 - 06.30"
+
+
+class FakeMessageProvider:
+    def __init__(self) -> None:
+        self.message = Message("/icons/night.png", "22.00 - 07.00")
+
+    def get_message(self) -> Message:
+        return self.message
+
+
+def test_manual_alarm_override_survives_refresh_until_consumed() -> None:
+    provider = FakeMessageProvider()
+    controller = AlarmController(provider)
+    wake_at = datetime(2026, 8, 20, 9, 0, tzinfo=timezone.utc)
+
+    controller.set_manual_time(wake_at)
+    provider.message = Message("/icons/night.png", "21.00 - 06.00")
+    controller.refresh()
+
+    status = controller.get_status()
+    assert status["manual_override"] is True
+    assert status["source"] == "manual"
+    assert status["wake_at"] == wake_at.isoformat()
+
+    controller.consume()
+
+    assert controller.get_status()["manual_override"] is False
+    assert controller.get_status()["source"] == "google"

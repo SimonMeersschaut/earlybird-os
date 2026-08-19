@@ -3,7 +3,9 @@ import json
 from threading import Thread
 from pathlib import Path
 
+from alarm_clock.alarm import AlarmController
 from alarm_clock.application import ClockApplication
+from alarm_clock.calendar import AlarmCalculator
 from alarm_clock.message import Message
 
 
@@ -53,3 +55,36 @@ def test_server_serves_the_clock_ui(tmp_path: Path) -> None:
     ]
     assert message_response.status == 200
     assert message_body == {"icon": "/icons/test.svg", "text": "Time to go to sleep"}
+
+
+def test_alarm_api_accepts_a_manual_override(tmp_path: Path) -> None:
+    web_root = tmp_path / "web"
+    web_root.mkdir()
+    (web_root / "index.html").write_text("<p>clock</p>", encoding="utf-8")
+    (web_root / "alarm.html").write_text("<p>alarm</p>", encoding="utf-8")
+
+    class Provider:
+        calculator = AlarmCalculator()
+
+        def get_message(self) -> Message:
+            return Message("/icons/night.png", "22.00 - 07.00")
+
+    controller = AlarmController(Provider())
+    server = ClockApplication(web_root, message_provider=controller).create_server(port=0)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
+    try:
+        connection = HTTPConnection("127.0.0.1", server.server_port)
+        connection.request("POST", "/api/alarm", body=json.dumps({"time": "09:00"}), headers={"Content-Type": "application/json"})
+        response = connection.getresponse()
+        body = json.loads(response.read().decode("utf-8"))
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join()
+
+    assert response.status == 200
+    assert body["source"] == "manual"
+    assert body["manual_override"] is True
+    assert "T09:00:00" in body["wake_at"]

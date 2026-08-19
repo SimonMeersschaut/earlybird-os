@@ -23,6 +23,15 @@ class CalendarEvent:
     all_day: bool = False
 
 
+@dataclass(frozen=True)
+class AlarmCalculation:
+    """The alarm times calculated from the first timed calendar event."""
+
+    sleep_at: datetime
+    wake_at: datetime
+    first_task_at: datetime
+
+
 class Calendar(Protocol):
     def events_for(self, day: date) -> list[CalendarEvent]: ...
 
@@ -92,16 +101,23 @@ class AlarmCalculator:
         self.wake_margin = wake_margin
 
     def message_for(self, events: list[CalendarEvent], now: datetime) -> Message:
+        calculation = self.calculate(events, now)
+        if calculation is None:
+            return Message(SLEEP_ICON, "No alarm scheduled")
+        return Message(SLEEP_ICON, f"{self._format(calculation.sleep_at)} - {self._format(calculation.wake_at)}")
+
+    def calculate(self, events: list[CalendarEvent], now: datetime) -> AlarmCalculation | None:
         timed_events = [
             event for event in events
             if not event.all_day and event.starts_at.date() == (now.date() + timedelta(days=1))
         ]
         if not timed_events:
-            return Message(SLEEP_ICON, "No alarm scheduled")
+            return None
 
-        wake_at = min(event.starts_at for event in timed_events) - self.wake_margin
+        first_task_at = min(event.starts_at for event in timed_events)
+        wake_at = first_task_at - self.wake_margin
         sleep_at = wake_at - self.sleep_duration
-        return Message(SLEEP_ICON, f"{self._format(sleep_at)} - {self._format(wake_at)}")
+        return AlarmCalculation(sleep_at, wake_at, first_task_at)
 
     @staticmethod
     def _format(value: datetime) -> str:
@@ -124,6 +140,10 @@ class CalendarMessageProvider:
     def get_message(self) -> Message:
         now = self.clock()
         return self.calculator.message_for(self.calendar.events_for(now.date() + timedelta(days=1)), now)
+
+    def get_alarm_calculation(self) -> AlarmCalculation | None:
+        now = self.clock()
+        return self.calculator.calculate(self.calendar.events_for(now.date() + timedelta(days=1)), now)
 
 
 class RefreshingMessageProvider:
