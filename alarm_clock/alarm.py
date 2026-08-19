@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from threading import Event, Lock
+from typing import Callable
 from .calendar import AlarmCalculation, AlarmCalculator, CalendarMessageProvider, SLEEP_ICON
 from .message import Message
 
@@ -43,6 +44,7 @@ class AlarmController:
         self._manual_wake_at: datetime | None = None
         self._lock = Lock()
         self._stop = Event()
+        self._changed: list[Callable[[], None]] = []
         try:
             self.refresh()
         except Exception:
@@ -73,12 +75,21 @@ class AlarmController:
         with self._lock:
             self._manual_wake_at = wake_at
             self._schedule = AlarmSchedule(sleep_at, wake_at, "manual")
+            self._notify_changed()
             return self._schedule
 
     def consume(self) -> None:
         with self._lock:
             self._manual_wake_at = None
         self.refresh()
+        self._notify_changed()
+
+    def add_change_listener(self, listener: Callable[[], None]) -> None:
+        self._changed.append(listener)
+
+    def _notify_changed(self) -> None:
+        for listener in tuple(self._changed):
+            listener()
 
     def get_message(self) -> Message:
         with self._lock:
@@ -113,6 +124,7 @@ class AlarmController:
 
     def stop(self) -> None:
         self._stop.set()
+        self._notify_changed()
 
     def _schedule_from_message(self, message: Message, source: str) -> AlarmSchedule | None:
         if message.text == "No alarm scheduled":

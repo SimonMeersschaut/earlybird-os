@@ -35,12 +35,7 @@ class ClockApplication:
         """Build the HTTP server without coupling callers to its implementation."""
         from .server import ClockServer
 
-        if isinstance(self.alarm_controller, AlarmController):
-            self._refresh_thread = Thread(target=self.alarm_controller.run, daemon=True)
-            self._refresh_thread.start()
-        self._wakeup_thread = Thread(target=self.wakeup_service.run, daemon=True)
-        self._wakeup_thread.start()
-        return ClockServer(
+        server = ClockServer(
             host,
             port,
             self.web_root,
@@ -48,6 +43,12 @@ class ClockApplication:
             self.alarm_controller,
             self.wakeup_service,
         )
+        if isinstance(self.alarm_controller, AlarmController):
+            self._refresh_thread = Thread(target=self.alarm_controller.run, daemon=True)
+            self._refresh_thread.start()
+        self._wakeup_thread = Thread(target=self.wakeup_service.run, daemon=True)
+        self._wakeup_thread.start()
+        return server
 
 
 class _FixedMessageProvider:

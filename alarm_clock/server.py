@@ -4,6 +4,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from html import escape
 import json
+from queue import Empty, Queue
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -12,6 +13,12 @@ from pathlib import Path
 
 class ClockRequestHandler(SimpleHTTPRequestHandler):
     """Serve the UI assets from the application web root."""
+
+    _client_disconnect_errors = (
+        BrokenPipeError,
+        ConnectionAbortedError,
+        ConnectionResetError,
+    )
 
     def __init__(
         self,
@@ -26,6 +33,13 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
         self.wakeup_service = wakeup_service
         super().__init__(*args, **kwargs)
 
+    def handle(self) -> None:
+        try:
+            super().handle()
+        except self._client_disconnect_errors:
+            # Browsers can close a request while the server is writing its response.
+            pass
+
     def do_GET(self) -> None:
         if self.path == "/api/message":
             self._serve_message_json()
@@ -36,6 +50,9 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
         if self.path == "/api/wakeup":
             status = self.wakeup_service.get_status() if self.wakeup_service else {"awake": False}
             self._serve_json(status)
+            return
+        if self.path == "/api/wakeup/events":
+            self._serve_wakeup_events()
             return
         page_paths = {
             "/": "index.html",
@@ -67,8 +84,15 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
                 self.alarm_controller.consume()
             else:
                 value = datetime.strptime(payload["time"], "%H:%M").time()
-                tomorrow = datetime.now().astimezone() + timedelta(days=1)
-                wake_at = tomorrow.replace(hour=value.hour, minute=value.minute, second=0, microsecond=0)
+                now = datetime.now().astimezone()
+                wake_at = now.replace(
+                    hour=value.hour,
+                    minute=value.minute,
+                    second=0,
+                    microsecond=0,
+                )
+                if wake_at <= now:
+                    wake_at = wake_at.replace(day=now.day) + timedelta(days=1)
                 self.alarm_controller.set_manual_time(wake_at)
             self._serve_json(self.alarm_controller.get_status())
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
@@ -88,6 +112,27 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _serve_wakeup_events(self) -> None:
+        events = Queue()
+        remove_listener = self.wakeup_service.add_listener(lambda: events.put("wakeup"))
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Connection", "keep-alive")
+        self.end_headers()
+        try:
+            while True:
+                try:
+                    events.get(timeout=15)
+                    self.wfile.write(b"event: wakeup\ndata: /wakeup\n\n")
+                except Empty:
+                    self.wfile.write(b": keep-alive\n\n")
+                self.wfile.flush()
+        except self._client_disconnect_errors:
+            pass
+        finally:
+            remove_listener()
 
     def _serve_page(self, filename: str, inject_message: bool) -> None:
         page = (Path(self.directory) / filename).read_text(encoding="utf-8")
