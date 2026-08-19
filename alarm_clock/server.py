@@ -13,9 +13,17 @@ from pathlib import Path
 class ClockRequestHandler(SimpleHTTPRequestHandler):
     """Serve the UI assets from the application web root."""
 
-    def __init__(self, *args: object, message_provider, alarm_controller, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        message_provider,
+        alarm_controller,
+        wakeup_service=None,
+        **kwargs: object,
+    ) -> None:
         self.message_provider = message_provider
         self.alarm_controller = alarm_controller
+        self.wakeup_service = wakeup_service
         super().__init__(*args, **kwargs)
 
     def do_GET(self) -> None:
@@ -24,6 +32,10 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
             return
         if self.path == "/api/alarm":
             self._serve_json(self.alarm_controller.get_status())
+            return
+        if self.path == "/api/wakeup":
+            status = self.wakeup_service.get_status() if self.wakeup_service else {"awake": False}
+            self._serve_json(status)
             return
         page_paths = {
             "/": "index.html",
@@ -34,6 +46,8 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
             "/alarm.html": "alarm.html",
             "/morning-briefing": "morning-briefing.html",
             "/morning-briefing.html": "morning-briefing.html",
+            "/wakeup": "wakeup.html",
+            "/wakeup.html": "wakeup.html",
         }
         if self.path in page_paths:
             self._serve_page(page_paths[self.path], inject_message=self.path in {"/", "/index.html"})
@@ -97,20 +111,33 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
 class ClockServer(ThreadingHTTPServer):
     """HTTP server configured with the clock application's asset directory."""
 
-    def __init__(self, host: str, port: int, web_root: Path, message_provider, alarm_controller=None) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        web_root: Path,
+        message_provider,
+        alarm_controller=None,
+        wakeup_service=None,
+    ) -> None:
         alarm_controller = alarm_controller or message_provider
         handler = partial(
             ClockRequestHandler,
             directory=str(web_root),
             message_provider=message_provider,
             alarm_controller=alarm_controller,
+            wakeup_service=wakeup_service,
         )
         self.message_provider = message_provider
         self.alarm_controller = alarm_controller
+        self.wakeup_service = wakeup_service
         super().__init__((host, port), handler)
 
     def server_close(self) -> None:
         stop = getattr(self.alarm_controller, "stop", None)
         if stop:
             stop()
+        wakeup_stop = getattr(self.wakeup_service, "stop", None)
+        if wakeup_stop:
+            wakeup_stop()
         super().server_close()

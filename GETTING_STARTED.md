@@ -17,3 +17,9 @@ Run the focused test suite with:
 ```powershell
 python -m pytest
 ```
+
+
+```bash
+pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+pip install phue
+```

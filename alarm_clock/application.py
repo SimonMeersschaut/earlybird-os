@@ -6,6 +6,7 @@ from threading import Thread
 from .alarm import AlarmController, FixedAlarmController
 from .calendar import CalendarMessageProvider, GoogleCalendar, RefreshingMessageProvider
 from .message import Message
+from .wakeup import PhilipsHueSunrise, WakeupService
 
 
 class ClockApplication:
@@ -23,7 +24,12 @@ class ClockApplication:
             calendar_provider = CalendarMessageProvider(GoogleCalendar())
             self.alarm_controller = AlarmController(calendar_provider)
             self.message_provider = self.alarm_controller
+        self.wakeup_service = WakeupService(
+            self.alarm_controller,
+            PhilipsHueSunrise("Kamer Simon"),
+        )
         self._refresh_thread = None
+        self._wakeup_thread = None
 
     def create_server(self, host: str = "127.0.0.1", port: int = 8000):
         """Build the HTTP server without coupling callers to its implementation."""
@@ -32,7 +38,16 @@ class ClockApplication:
         if isinstance(self.alarm_controller, AlarmController):
             self._refresh_thread = Thread(target=self.alarm_controller.run, daemon=True)
             self._refresh_thread.start()
-        return ClockServer(host, port, self.web_root, self.message_provider, self.alarm_controller)
+        self._wakeup_thread = Thread(target=self.wakeup_service.run, daemon=True)
+        self._wakeup_thread.start()
+        return ClockServer(
+            host,
+            port,
+            self.web_root,
+            self.message_provider,
+            self.alarm_controller,
+            self.wakeup_service,
+        )
 
 
 class _FixedMessageProvider:

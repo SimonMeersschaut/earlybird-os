@@ -68,6 +68,21 @@
     updateClock();
     setInterval(updateClock, 1000);
     setInterval(updateMessage, 10000);
+    let wakeupRedirected = false;
+
+    async function checkWakeup() {
+      try {
+        const response = await fetch("/api/wakeup", { cache: "no-store" });
+        if (response.ok && (await response.json()).awake && !wakeupRedirected) {
+          wakeupRedirected = true;
+          window.location.href = "/wakeup";
+        }
+      } catch (error) {
+        // The server may be temporarily unavailable while restarting.
+      }
+    }
+
+    setInterval(checkWakeup, 1000);
 
     function showApps() {
       clearTimeout(appsTransitionTimer);
