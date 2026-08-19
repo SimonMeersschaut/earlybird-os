@@ -8,6 +8,8 @@ Minimal alarm clock UI foundation served by Python's standard library.
 python run.py
 ```
 
+The first calendar check authenticates with Google Calendar using `credentials.json` and stores the read-only token in `token.json`. The calendar is refreshed every ten minutes. All-day events are ignored; the first timed event tomorrow determines the alarm.
+
 Open http://127.0.0.1:8000 in a browser. Stop the server with `Ctrl+C`.
 
 Run the focused test suite with:
