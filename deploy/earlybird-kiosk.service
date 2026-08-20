@@ -1,0 +1,23 @@
+[Unit]
+Description=Earlybird Chromium kiosk
+Requires=earlybird.service
+After=earlybird.service getty@tty1.service
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/earlybird/.Xauthority
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/usr/bin/xinit /usr/local/bin/earlybird-start-kiosk -- /usr/lib/xorg/Xorg :0 vt1 -keeptty -nolisten tcp
+User=earlybird
+Group=earlybird
+TTYPath=/dev/tty1
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
