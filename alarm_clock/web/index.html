@@ -68,10 +68,26 @@
 
     updateClock();
     setInterval(updateClock, 1000);
-    setInterval(updateMessage, 10000);
-    const wakeupEvents = new EventSource("/api/wakeup/events");
-    wakeupEvents.addEventListener("wakeup", () => {
-      window.location.href = "/wakeup";
+
+    const liveEvents = new EventSource("/live");
+    liveEvents.addEventListener("message", (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        messageIcon.src = payload.icon;
+        messageText.textContent = payload.text;
+      } catch (error) {
+        // Keep the current UI state when malformed data is received.
+      }
+    });
+    liveEvents.addEventListener("redirect", (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.to) {
+          window.location.href = payload.to;
+        }
+      } catch (error) {
+        // Ignore invalid redirect payloads.
+      }
     });
 
     function showApps() {

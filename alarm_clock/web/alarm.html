@@ -67,13 +67,6 @@
       manualOption.classList.toggle("is-active", status.manual_override);
     }
 
-    async function loadAlarm() {
-      const response = await fetch("/api/alarm", { cache: "no-store" });
-      if (response.ok) {
-        renderAlarm(await response.json());
-      }
-    }
-
     async function setAutomatic() {
       const response = await fetch("/api/alarm", {
         method: "POST",
@@ -102,6 +95,15 @@
       }
     }
 
+    const liveEvents = new EventSource("/live");
+    liveEvents.addEventListener("alarm", (event) => {
+      try {
+        renderAlarm(JSON.parse(event.data));
+      } catch (error) {
+        // Ignore malformed update packets and keep current state.
+      }
+    });
+
     for (let hour = 6; hour <= 9; hour += 1) {
       for (const minute of [0, 30]) {
         const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
@@ -113,8 +115,6 @@
         alarmTimes.append(button);
       }
     }
-
-    loadAlarm();
   </script>
 </body>
 </html>
