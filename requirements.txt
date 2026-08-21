@@ -4,3 +4,4 @@ google-auth-oauthlib>=1.0
 phue>=1.1
 pygame>=2.6
 mutagen>=1.47
+pytest

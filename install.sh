@@ -20,7 +20,8 @@ sudo apt install -y \
   libxtst6 \
   libx11-xcb1 \
   libgbm1 \
-  xorg
+  xorg \
+  python3-pytest # for when you're not in a venv
 
 # Libraries for input drivers (Touch screen)
 sudo apt install -y \

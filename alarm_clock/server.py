@@ -175,6 +175,7 @@ class ClockServer(ThreadingHTTPServer):
         message_provider,
         alarm_controller=None,
         wakeup_service=None,
+        updater=None,
     ) -> None:
         alarm_controller = alarm_controller or message_provider
         handler = partial(
@@ -187,9 +188,13 @@ class ClockServer(ThreadingHTTPServer):
         self.message_provider = message_provider
         self.alarm_controller = alarm_controller
         self.wakeup_service = wakeup_service
+        self.updater = updater
         super().__init__((host, port), handler)
 
     def server_close(self) -> None:
+        updater_stop = getattr(self.updater, "stop", None)
+        if updater_stop:
+            updater_stop()
         stop = getattr(self.alarm_controller, "stop", None)
         if stop:
             stop()
