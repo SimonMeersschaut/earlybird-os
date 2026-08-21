@@ -1,23 +1,27 @@
 [Unit]
-Description=Earlybird Chromium kiosk
-Requires=earlybird.service
-After=earlybird.service getty@tty1.service
+Description=Browser of Earlybird alarm clock
+After=network-online.target earlybird-server.service getty@tty1.service
+Wants=network-online.target
+Requires=earlybird-server.service
 Conflicts=getty@tty1.service
 
 [Service]
 Type=simple
-Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/earlybird/.Xauthority
-Environment=XDG_RUNTIME_DIR=/run/user/1000
-ExecStart=/usr/bin/xinit /usr/local/bin/earlybird-start-kiosk -- /usr/lib/xorg/Xorg :0 vt1 -keeptty -nolisten tcp
+WorkingDirectory=/home/earlybird/earlybird-os
+ExecStart=/usr/bin/xinit /home/earlybird/earlybird-os/deploy/start-kiosk.sh -- /usr/lib/xorg/Xorg :0 vt1 -keeptty -nolisten tcp -verbose 3 -logverbose 3
 User=earlybird
 Group=earlybird
-TTYPath=/dev/tty1
 StandardInput=tty
-StandardOutput=journal
-StandardError=journal
+TTYPath=/dev/tty1
+UnsetEnvironment=TERM
+PAMName=login
 Restart=on-failure
 RestartSec=2
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Force standard output and errors into systemd journal
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

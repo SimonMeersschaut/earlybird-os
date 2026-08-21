@@ -20,3 +20,16 @@ sudo apt install -y \
 sudo apt install -y \
   xserver-xorg-input-evdev \
   xserver-xorg-input-libinput
+
+
+# Install python packages
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+sudo apt install -y unclutter # for hiding the mouse
+
+./services.sh
+
+# sudo usermod -aG tty,video earlybird
+# sudo usermod -aG video,input,render,tty earlybird
+# sudo dpkg-reconfigure xserver-xorg-legacy # select anybody (for terminal usage)

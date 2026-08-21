@@ -13,6 +13,7 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main() -> None:
+    print("Starting server.")
     arguments = parse_arguments()
     application = ClockApplication()
     server = application.create_server(arguments.host, arguments.port)
