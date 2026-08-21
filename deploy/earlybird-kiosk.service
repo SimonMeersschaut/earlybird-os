@@ -1,27 +1,29 @@
 [Unit]
 Description=Browser of Earlybird alarm clock
-After=network-online.target earlybird-server.service getty@tty1.service
-Wants=network-online.target
+After=network-online.target earlybird-server.service graphical.target time-sync.target
+Wants=network-online.target time-sync.target
 Requires=earlybird-server.service
-Conflicts=getty@tty1.service
 
 [Service]
 Type=simple
-WorkingDirectory=/home/earlybird/earlybird-os
-ExecStart=/usr/bin/xinit /home/earlybird/earlybird-os/deploy/start-kiosk.sh -- /usr/lib/xorg/Xorg :0 vt1 -keeptty -nolisten tcp -verbose 3 -logverbose 3
 User=earlybird
 Group=earlybird
-StandardInput=tty
-TTYPath=/dev/tty1
-UnsetEnvironment=TERM
-PAMName=login
-Restart=on-failure
-RestartSec=2
-ExecReload=/bin/kill -HUP $MAINPID
+WorkingDirectory=/home/earlybird/earlybird-os
 
-# Force standard output and errors into systemd journal
+# Environmental variables required for X11 / Chromium
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/earlybird/.Xauthority
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+
+# Allocate TTY1 and launch xinit
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+StandardInput=tty
 StandardOutput=journal
 StandardError=journal
+
+ExecStart=/usr/bin/xinit /home/earlybird/earlybird-os/deploy/start-kiosk.sh -- /usr/lib/xorg/Xorg :0 vt1 -keeptty -nolisten tcp
 
 [Install]
 WantedBy=multi-user.target

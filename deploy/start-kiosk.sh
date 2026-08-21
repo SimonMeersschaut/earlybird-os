@@ -1,15 +1,31 @@
 #!/bin/sh
 
-exec 2>&1
+# Redirect stdout and stderr so it appears in systemd journal / console
+exec 1>&2
 set -x
 
-echo "Checking if the server is online."
+export DISPLAY=:0
+export XAUTHORITY=/home/earlybird/.Xauthority
+
+echo "Checking if the server is online..."
 until /usr/bin/curl --silent --fail http://127.0.0.1:8000/ >/dev/null; do
     /usr/bin/sleep 1
-    echo "Server not found."
+    echo "Server not found, retrying..."
 done
-echo "Server found. Starting webbrowser"
+echo "Server online! Launching Chromium..."
 
-# exec /usr/bin/chromium --kiosk --no-first-run --disable-session-crashed-bubble http://localhost:8000/
+# Hide mouse cursor
 unclutter -idle 0 -root &
-exec /usr/bin/chromium --no-sandbox --kiosk --incognito --no-first-run --disable-session-crashed-bubble --force-first-run --kiosk-printing --hide-scrollbars --touch-events=enabled http://localhost:8000/
+
+# Launch Chromium
+exec /usr/bin/chromium \
+  --no-sandbox \
+  --kiosk \
+  --incognito \
+  --no-first-run \
+  --disable-session-crashed-bubble \
+  --force-first-run \
+  --kiosk-printing \
+  --hide-scrollbars \
+  --touch-events=enabled \
+  http://127.0.0.1:8000/

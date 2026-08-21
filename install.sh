@@ -33,8 +33,12 @@ pip install -r requirements.txt
 
 # for hiding the mouse
 sudo apt install -y unclutter
+sudo apt install -y chromium-browser
 
 ./deploy/services.sh
 
+sudo cp deploy/Xwrapper.config /etc/X11/
+
 # Install OLLama
 curl -fsSL https://ollama.com/install.sh | sh
+

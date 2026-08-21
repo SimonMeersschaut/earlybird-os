@@ -14,6 +14,4 @@ chmod +x deploy/start-server.sh
 chmod +x deploy/start-kiosk.sh
 
 # Reload systemd configuration from disk
-sudo systemctl daemon-reload
-
 ./restart.sh
