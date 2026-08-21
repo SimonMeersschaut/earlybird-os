@@ -104,7 +104,7 @@ class AlarmCalculator:
         calculation = self.calculate(events, now)
         if calculation is None:
             return Message(SLEEP_ICON, "No alarm scheduled")
-        return Message(SLEEP_ICON, f"{self._format(calculation.sleep_at)} - {self._format(calculation.wake_at)}")
+        return Message(SLEEP_ICON, f"{self._format(calculation.wake_at)}")
 
     def calculate(self, events: list[CalendarEvent], now: datetime) -> AlarmCalculation | None:
         timed_events = [

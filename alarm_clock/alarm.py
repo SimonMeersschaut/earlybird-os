@@ -23,7 +23,7 @@ class AlarmSchedule:
     def message(self) -> Message:
         return Message(
             SLEEP_ICON,
-            f"{self.sleep_at.strftime('%H.%M')} - {self.wake_at.strftime('%H.%M')}",
+            f"{self.wake_at.strftime('%H.%M')}",
         )
 
 

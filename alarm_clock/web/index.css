@@ -13,8 +13,9 @@
 .time {
   z-index: 50;
   display: block;
-  color: #474747;
-  font-size: clamp(4rem, 18vw, 18rem);
+  color: #9f9f9f;
+  font-size: 15rem;
+  font-family: system-ui;
   font-weight: 900;
   letter-spacing: 0;
   line-height: 0.9;
@@ -23,10 +24,10 @@
 
 .message {
   align-items: center;
-  color: #303030;
+  color: #a9a7a7;
   display: flex;
   font-family: Arial, sans-serif;
-  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-size: 3.5rem;
   font-weight: 700;
   gap: 0.6rem;
   justify-content: center;
@@ -41,7 +42,8 @@
 .message img {
   height: 1.4em;
   width: 1.4em;
-  filter: brightness(0) invert(0.25);
+  filter: brightness(0) invert(0.75);
+  margin-right: 26px;
 }
 
 .apps {
@@ -93,7 +95,7 @@
 
 @media (max-width: 30rem) {
   .time {
-    font-size: 19vw;
+    font-size: 19rem;
   }
 
   .app-grid {

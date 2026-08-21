@@ -14,7 +14,7 @@
   color: #111;
   cursor: pointer;
   display: flex;
-  font: 700 clamp(1.5rem, 3vw, 3rem) Arial, sans-serif;
+  font: 700 3vw Arial, sans-serif;
   justify-content: center;
   margin: auto;
   padding: 1rem;

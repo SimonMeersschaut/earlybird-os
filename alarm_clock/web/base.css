@@ -16,20 +16,20 @@ body {
 .app-icon,
 .app-page-icon {
   font-family: Arial, sans-serif;
-  font-size: clamp(3rem, 9vw, 5rem);
+  font-size: 9vw;
   font-weight: 700;
   line-height: 1;
 }
 
 .app-name {
   font-family: Arial, sans-serif;
-  font-size: 0.9rem;
+  font-size: 1.6rem;
   font-weight: 700;
 }
 
 .app-clock {
   color: #474747;
-  font-size: clamp(2rem, 7vw, 5rem);
+  font-size: 7rem;
   font-weight: 900;
   left: 50%;
   line-height: 1;

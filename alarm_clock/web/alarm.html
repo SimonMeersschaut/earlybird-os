@@ -102,8 +102,8 @@
       }
     }
 
-    for (let hour = 6; hour <= 20; hour += 1) {
-      for (const minute of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 20, 30, 40, 45, 50, 55, 57, 58, 59]) {
+    for (let hour = 6; hour <= 9; hour += 1) {
+      for (const minute of [0, 30]) {
         const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
         const button = document.createElement("button");
         button.className = "alarm-time-choice";

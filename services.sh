@@ -16,5 +16,4 @@ chmod +x deploy/start-kiosk.sh
 # Reload systemd configuration from disk
 sudo systemctl daemon-reload
 
-sudo systemctl restart earlybird-kiosk.service
-sudo systemctl restart earlybird-server.service
+./restart.sh
