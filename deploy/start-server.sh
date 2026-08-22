@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Restart kiosk
+sudo systemctl restart earlybird-kiosk
+
 echo "Starting server."
 . venv/bin/activate
 echo "Activated virtual environment."
