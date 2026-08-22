@@ -1,0 +1,17 @@
+[Unit]
+Description=Ollama model
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/earlybird/earlybird-os
+ExecStart=/home/earlybird/earlybird-os/deploy/start-llama.sh
+User=earlybird
+Group=earlybird
+Restart=on-failure
+RestartSec=2
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
