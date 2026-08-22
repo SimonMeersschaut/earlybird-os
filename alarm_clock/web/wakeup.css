@@ -8,17 +8,17 @@
 .stop-alarm {
   align-items: center;
   aspect-ratio: 1.61;
-  background: #d7a18e;
+  background: #eeeeee;
   border: 0;
   border-radius: 1rem;
   color: #111;
   cursor: pointer;
   display: flex;
-  font: 700 3vw Arial, sans-serif;
+  font: 700 8.2vw Arial, sans-serif;
   justify-content: center;
   margin: auto;
   padding: 1rem;
-  width: min(40vw, 30rem);
+  width: min(57.4vw, 37.8rem);;
 }
 
 .stop-alarm:hover,

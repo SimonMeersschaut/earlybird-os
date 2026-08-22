@@ -26,14 +26,23 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    document.querySelector("#stop-alarm").addEventListener("click", () => {
-      fetch("/api/wakeup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "stop" })
-      }).then(resp => {
-        window.location = "/";
-      })
+    document.querySelector("#stop-alarm").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try {
+        const resp = await fetch("/api/wakeup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "stop" })
+        });
+        if (!resp.ok) {
+          throw new Error("Failed to stop alarm");
+        }
+        window.location = "/briefing";
+      } catch (error) {
+        console.error(error);
+        button.disabled = false;
+      }
     });
   </script>
 </body>

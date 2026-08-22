@@ -10,8 +10,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-
-
 class ClockRequestHandler(SimpleHTTPRequestHandler):
     """Serve the UI assets from the application web root."""
 
@@ -59,8 +57,8 @@ class ClockRequestHandler(SimpleHTTPRequestHandler):
             "/weather.html": "weather.html",
             "/alarm": "alarm.html",
             "/alarm.html": "alarm.html",
-            "/morning-briefing": "morning-briefing.html",
-            "/morning-briefing.html": "morning-briefing.html",
+            "/briefing": "briefing.html",
+            "/briefing.html": "briefing.html",
             "/wakeup": "wakeup.html",
             "/wakeup.html": "wakeup.html",
         }
