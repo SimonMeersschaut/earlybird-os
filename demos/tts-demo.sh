@@ -1,0 +1,1 @@
+echo "Hello! This text is being spoken locally on your Raspberry Pi." | ~/piper-tts/piper/piper --model ~/piper-tts/en_US-lessac-medium.onnx -f output.wav

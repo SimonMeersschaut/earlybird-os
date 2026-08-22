@@ -43,3 +43,14 @@ sudo cp deploy/Xwrapper.config /etc/X11/
 # Install OLLama
 curl -fsSL https://ollama.com/install.sh | sh
 
+# Install Piper
+mkdir ~/piper-tts && cd ~/piper-tts
+# Download the ARM64 release of Piper
+wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_arm64.tar.gz
+tar -xzf piper_arm64.tar.gz
+
+wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+
+cd ~/earlybird-os
+mkdir tmp

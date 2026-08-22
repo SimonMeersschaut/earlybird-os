@@ -26,6 +26,10 @@ class PhilipsHueSunrise:
             print("Could not connect to the bridge.")
             return
         group = bridge.get_group(bridge.get_group_id_by_name(self.group_name))
+        # start dimmed
+        for light_id in group["lights"]:
+            bridge.set_light(int(light_id), {"on": True, "bri": 0})
+        # Transition to full brightness
         command = {
             "on": True,
             "bri": 254,

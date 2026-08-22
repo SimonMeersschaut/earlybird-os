@@ -4,6 +4,9 @@
 exec 1>&2
 set -x
 
+# turn off the backlight
+echo 1 | sudo tee /sys/class/backlight/10-0045/bl_power
+
 export DISPLAY=:0
 export XAUTHORITY=/home/earlybird/.Xauthority
 

@@ -9,5 +9,6 @@ response = requests.post(
     },
 )
 
+print("Running llama model")
 summary = response.json()["response"]
 print(summary)
