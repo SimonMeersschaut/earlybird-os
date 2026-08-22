@@ -13,5 +13,11 @@ Restart=on-failure
 RestartSec=2
 ExecReload=/bin/kill -HUP $MAINPID
 
+# Force immediate termination of all child processes
+KillMode=control-group
+KillSignal=SIGKILL
+SendSIGKILL=yes
+TimeoutStopSec=0
+
 [Install]
 WantedBy=multi-user.target

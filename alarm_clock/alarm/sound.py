@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 from pathlib import Path
 from typing import Callable
-
+import time
 
 class PygameAudioAlarm:
 	"""Play the alarm track from a random position and loop it."""
@@ -24,6 +24,8 @@ class PygameAudioAlarm:
 
 		import pygame
 		from mutagen.mp3 import MP3
+		
+		time.sleep(2) # wait for the lights to glow
 
 		if not pygame.mixer.get_init():
 			pygame.mixer.init()
