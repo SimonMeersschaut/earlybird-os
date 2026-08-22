@@ -1,0 +1,29 @@
+Schrijf een ochtendbriefing aan Simon om mee wakker te worden.
+Ik verwacht een volledig uitgeschreven, vlotte tekst die voorgelezen zal worden door een voice assistent.
+Het rapport moet als het ware een samenvatting zijn van de komende dag.
+
+Ik wil dat je het rapport verdeelt in hoofdstukken met behulp van de volgende toegestane tags: `# Inleiding`, `# Kalender`, `# Weer`.
+Let op dat dit de enige toegestane tags zijn.
+Het is niet toegestaan om andere markdown-opmaak te gebruiken (dus ook niet dubbele hastag).
+
+Datum: 22-08-2026
+Tijd: 07:00
+Event: Dag voor slachtoffers van religieus geweld
+
+Temperature: 16 graden celsius.
+Type: bewolkt
+Neerslagkans: 0%
+Luchtvochtigheid: 79%
+Wind: 8 km/h
+
+Jouw taak is om deze evenementen te integreren in de doorlopende tekst.
+Hier zijn veel voorkomende conventies:
+- 'KUL' staat voor KULeuven; de universiteit waar Simon naar toe gaat.
+- 'HC' betekent Hoorcollege
+- 'OZ' betekent oefenzitting
+- de 'Bib` kalender is een gedeelde kalender met mijn vrienden. Hier schrijven we in wie wanneer naar de bib gaat en ook wanneer we samen uitgaan.
+
+Evenementen:
+
+{"start": "10.00", "end": "12.00", "name": "omi gaan halen"}
+{"start": "18.00", "end": "20.00", "name": "Maria komt voor barbeque"}

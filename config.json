@@ -3,6 +3,8 @@
 
     },
     "alarm": {
+        "home-minutes": 60,
+        "transfer-minutes": 30,
         "max-wakeup-time": "09:00"
     }
 }
