@@ -1,10 +1,13 @@
 import requests
 
+with open("llm-prompt.txt", 'r') as f:
+    prompt = f.read()
+
 response = requests.post(
     "http://localhost:11434/api/generate",
     json={
         "model": "llama3.2:1b",
-        "prompt": "Summarize this in two short sentences for a morning voice report: Today is sunny, 22°C, and there are no calendar events.",
+        "prompt": prompt,
         "stream": False,
     },
 )

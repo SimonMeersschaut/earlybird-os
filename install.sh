@@ -49,8 +49,11 @@ mkdir ~/piper-tts && cd ~/piper-tts
 wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_arm64.tar.gz
 tar -xzf piper_arm64.tar.gz
 
-wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
-wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+# wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+# wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+
+wget https://huggingface.co/rhasspy/piper-voices/blob/main/nl/nl_BE/rdh/medium/nl_BE-rdh-medium.onnx
+wget https://huggingface.co/rhasspy/piper-voices/blob/main/nl/nl_BE/rdh/medium/nl_BE-rdh-medium.onnx.json
 
 cd ~/earlybird-os
 mkdir tmp
